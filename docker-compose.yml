@@ -2,6 +2,8 @@ services:
   sl-police-nginx:
     build:
       context: ./sl-police-nginx
+      args:
+        NGINX_VERSION: ${NGINX_VERSION}
     container_name: sl-police-nginx
     ports:
       - "80:80"
@@ -11,6 +13,8 @@ services:
   sl-police-gateway:
     build:
       context: ./sl-police-gateway
+      args:
+        SPRING_BOOT_BASE_IMAGE: ${SPRING_BOOT_BASE_IMAGE}
     container_name: sl-police-gateway
     working_dir: /workspace
     command: ["sh", "-c", "sleep infinity"]
@@ -20,6 +24,8 @@ services:
   sl-police-monolith:
     build:
       context: ./sl-police-monolith
+      args:
+        SPRING_BOOT_BASE_IMAGE: ${SPRING_BOOT_BASE_IMAGE}
     container_name: sl-police-monolith
     working_dir: /workspace
     command: ["sh", "-c", "sleep infinity"]
@@ -27,7 +33,7 @@ services:
       - "8081:8081"
 
   sl-police-postgres-primary:
-    image: postgres:18.4-alpine
+    image: postgres:${POSTGRES_VERSION}
     container_name: sl-police-postgres-primary
     environment:
       POSTGRES_DB: traffic_fine
@@ -39,7 +45,7 @@ services:
       - sl_police_postgres_primary_data:/var/lib/postgresql/data
 
   sl-police-postgres-replica:
-    image: postgres:18.4-alpine
+    image: postgres:${POSTGRES_VERSION}
     container_name: sl-police-postgres-replica
     environment:
       POSTGRES_DB: traffic_fine
@@ -53,6 +59,8 @@ services:
   sl-police-mobile-app:
     build:
       context: ./sl-police-mobile-app
+      args:
+        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
     container_name: sl-police-mobile-app
     ports:
       - "8082:8082"
@@ -60,6 +68,8 @@ services:
   sl-police-motorist-portal:
     build:
       context: ./sl-police-motorist-portal
+      args:
+        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
     container_name: sl-police-motorist-portal
     ports:
       - "3000:3000"
@@ -67,6 +77,8 @@ services:
   sl-police-admin-portal:
     build:
       context: ./sl-police-admin-portal
+      args:
+        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
     container_name: sl-police-admin-portal
     ports:
       - "3001:3001"

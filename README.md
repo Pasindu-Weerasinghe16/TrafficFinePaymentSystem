@@ -9,6 +9,21 @@ This repository keeps the shared team environment pinned so all computers can ru
 - React Native: [sl-police-mobile-app/package.json](sl-police-mobile-app/package.json)
 - Infra stack: [`docker-compose.yml`](docker-compose.yml)
 
+## Root Environment Variables
+
+The root [`.env`](.env) file is the source of truth for shared version pins used by Docker Compose and the service Dockerfiles.
+
+| Variable | Value |
+| --- | --- |
+| `JAVA_VERSION` | `25` |
+| `NODE_VERSION` | `24.16.0` |
+| `REACT_VERSION` | `19.2.7` |
+| `REACT_NATIVE_VERSION` | `0.86.0` |
+| `NGINX_VERSION` | `1.30.2-alpine` |
+| `POSTGRES_VERSION` | `18.4-alpine` |
+| `SPRING_BOOT_BASE_IMAGE` | `eclipse-temurin:25-jre-alpine` |
+| `NODE_BASE_IMAGE` | `node:24.16.0-alpine` |
+
 ## Version Matrix
 
 | Component | Version |
