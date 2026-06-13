@@ -110,7 +110,8 @@ export default function CategoriesList({ isLiveMode }) {
                 React.createElement('tr', null,
                   React.createElement('th', null, 'Category ID'),
                   React.createElement('th', null, 'Violation Category'),
-                  React.createElement('th', null, 'Base Fine Amount')
+                  React.createElement('th', null, 'Base Fine Amount'),
+                  React.createElement('th', null, 'Actions')
                 )
               ),
               React.createElement('tbody', null,
@@ -118,7 +119,16 @@ export default function CategoriesList({ isLiveMode }) {
                   React.createElement('tr', { key: category.id },
                     React.createElement('td', null, category.id),
                     React.createElement('td', { style: { fontWeight: '600', color: 'var(--text-primary)' } }, category.name),
-                    React.createElement('td', { style: { color: 'var(--accent-blue)', fontWeight: '600' } }, `Rs. ${category.amount.toLocaleString('en-US')}`)
+                    React.createElement('td', { style: { color: 'var(--accent-blue)', fontWeight: '600' } }, `Rs. ${category.amount.toLocaleString('en-US')}`),
+                    React.createElement('td', null,
+                      React.createElement('button', {
+                        className: 'btn btn-danger btn-sm',
+                        style: { marginLeft: '0.5rem' },
+                        onClick: () => handleDeleteCategory(category.id)
+                      },
+                        React.createElement('i', { className: 'fa-solid fa-trash' })
+                      )
+                    )
                   )
                 )
               )
