@@ -266,26 +266,40 @@ export const api = {
     }
   },
 
-  async createCategory(name, amount) {
+  async deleteCategory(id) {
     if (this.isLiveMode()) {
-      const response = await fetch(`${API_BASE_URL}/api/admin/categories`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ name, amount: parseFloat(amount) })
+      const response = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
+        method: 'DELETE',
+        headers: this.getHeaders()
       });
-      if (!response.ok) throw new Error('Failed to create category');
+      if (!response.ok) throw new Error('Failed to delete category');
       return response.json();
     } else {
       await new Promise(resolve => setTimeout(resolve, 500));
       const categories = getStorageItem('mock_categories');
-      const newCategory = {
-        id: categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1,
-        name,
-        amount: parseFloat(amount)
-      };
-      categories.unshift(newCategory);
+      const index = categories.findIndex(c => c.id === parseInt(id));
+      if (index === -1) throw new Error('Category not found');
+      categories.splice(index, 1);
       setStorageItem('mock_categories', categories);
-      return newCategory;
+      return { success: true };
     }
-  }
-};
+  },
+
+  async deleteOfficer(id) {
+    if (this.isLiveMode()) {
+      const response = await fetch(`${API_BASE_URL}/api/admin/officers/${id}`, {
+        method: 'DELETE',
+        headers: this.getHeaders()
+      });
+      if (!response.ok) throw new Error('Failed to delete officer');
+      return response.json();
+    } else {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const officers = getStorageItem('mock_officers');
+      const index = officers.findIndex(o => o.id === parseInt(id));
+      if (index === -1) throw new Error('Officer not found');
+      officers.splice(index, 1);
+      setStorageItem('mock_officers', officers);
+      return { success: true };
+    }
+  }};

@@ -35,11 +35,33 @@
 }
 
 body {
+  background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqEt-gK-eyEz9AG-sQeY9_T5zMUcvUNowCIDO-JFWzXXM79GkGKH0qUT8&s=10') center/cover no-repeat fixed;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+.dashboard-wrapper {
+  background-size: 115%;
+  background-position: center;
+  background-attachment: scroll;
+  background-repeat: no-repeat;
+}
+
+.login-logo {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  height: 200px;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdOdZGSw0kKbavOY8V-hlK1_ElJMPADh52L5jRPRnbAg&s=10');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-logo img {
+  display: none;
 }
 
 /* Scrollbar styling */
@@ -208,7 +230,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 20%, rgba(15, 23, 42, 0.9) 0%, rgba(8, 12, 20, 1) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 90%), url('https://encrypted.tbn0.gstatic.com/images?q=tbn:ANd9GcSqEt-gK-eyEz9AG-sQeY9_T5zMUcvUNowCIDO-JFWzXXM79GkGKH0qUT8&s=10') center/cover no-repeat;
   padding: 1.5rem;
 }
 
@@ -219,12 +241,15 @@ body {
   text-align: center;
 }
 
-.login-logo {
-  margin-bottom: 1.5rem;
-  color: var(--accent-blue);
-  font-size: 3rem;
-  filter: drop-shadow(0 0 10px var(--accent-blue-glow));
+.police-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-left: 10%;
+  margin-right: 0;
+  display: block;
 }
+.login-logo { margin-bottom: 1.5rem; color: var(--accent-blue); font-size: 3rem; filter: drop-shadow(0 0 10px var(--accent-blue-glow)); }
 
 .login-title {
   font-family: var(--font-title);
@@ -246,6 +271,10 @@ body {
 .dashboard-wrapper {
   display: flex;
   min-height: 100vh;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 90%), url('https://encrypted.tbn0.gstatic.com/images?q=tbn:ANd9GcSqEt-gK-eyEz9AG-sQeY9_T5zMUcvUNowCIDO-JFWzXXM79GkGKH0qUT8&s=10') center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 /* Sidebar */

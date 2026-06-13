@@ -28,7 +28,7 @@ export default function Login({ onLoginSuccess, isLiveMode, onToggleLiveMode }) 
         
         // Brand Logo Icon
         React.createElement('div', { className: 'login-logo' },
-          React.createElement('i', { className: 'fa-solid fa-shield-halved' })
+                    React.createElement('img', { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lrdzQWrLJUaaNjKeMlPaWDiIKq8L15BeRqm2848C2g&s=10', alt: 'Police Icon', className: 'police-icon' })
         ),
         
         React.createElement('h1', { className: 'login-title' }, 'SL Traffic Police'),

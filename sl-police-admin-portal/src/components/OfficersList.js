@@ -34,6 +34,17 @@ export default function OfficersList({ isLiveMode }) {
     loadOfficers();
   }, [isLiveMode]);
 
+  const handleDeleteOfficer = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this officer?')) return;
+    try {
+      await api.deleteOfficer(id);
+      // Refresh list
+      loadOfficers();
+    } catch (err) {
+      setSubmitError(err.message || 'Failed to delete officer');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -119,7 +130,8 @@ export default function OfficersList({ isLiveMode }) {
                   React.createElement('th', null, 'Officer ID'),
                   React.createElement('th', null, 'Badge Number'),
                   React.createElement('th', null, 'Contact Number'),
-                  React.createElement('th', null, 'District Jurisdiction')
+                  React.createElement('th', null, 'District Jurisdiction'),
+                  React.createElement('th', null, 'Actions')
                 )
               ),
               React.createElement('tbody', null,
@@ -128,7 +140,16 @@ export default function OfficersList({ isLiveMode }) {
                     React.createElement('td', null, officer.id),
                     React.createElement('td', { style: { fontWeight: '600', color: 'var(--text-primary)' } }, officer.badgeNumber),
                     React.createElement('td', null, officer.phoneNumber),
-                    React.createElement('td', null, officer.district)
+                    React.createElement('td', null, officer.district),
+                    React.createElement('td', null,
+                      React.createElement('button', {
+                        className: 'btn btn-danger btn-sm',
+                        style: { marginLeft: '0.5rem' },
+                        onClick: () => handleDeleteOfficer(officer.id)
+                      },
+                        React.createElement('i', { className: 'fa-solid fa-trash' })
+                      )
+                    )
                   )
                 )
               )

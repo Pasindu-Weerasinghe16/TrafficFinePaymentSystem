@@ -17,7 +17,7 @@ export default function DashboardLayout({ currentView, setCurrentView, isLiveMod
       // Fixed Sidebar Navigation
       React.createElement('aside', { className: 'sidebar' },
         React.createElement('div', { className: 'sidebar-brand' },
-          React.createElement('i', { className: 'fa-solid fa-shield-halved' }),
+                    React.createElement('img', { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0lrdzQWrLJUaaNjKeMlPaWDiIKq8L15BeRqm2848C2g&s=10', alt: 'Police Icon', className: 'police-icon' }),
           React.createElement('span', null, 'SL POLICE ADMIN')
         ),
         
