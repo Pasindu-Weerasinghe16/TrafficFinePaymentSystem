@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: sl-police-gateway
+
+# Route tables, rate limits, and JWT key configuration will be added here.
