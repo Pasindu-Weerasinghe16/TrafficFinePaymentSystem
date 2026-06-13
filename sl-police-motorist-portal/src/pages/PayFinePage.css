@@ -1,0 +1,121 @@
+/* ===== Pay Fine Page ===== */
+
+.pay-page {
+  flex: 1;
+  padding: var(--space-8) 0 var(--space-16);
+  position: relative;
+}
+
+.pay-page__inner {
+  max-width: 560px;
+}
+
+/* --- Progress Bar --- */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-10);
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.progress-step__circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  background: var(--bg-surface-elevated);
+  color: var(--text-tertiary);
+  border: 2px solid var(--border-default);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.progress-step.active .progress-step__circle {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 0 12px var(--color-primary-glow);
+}
+
+.progress-step.completed .progress-step__circle {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: white;
+}
+
+.progress-step__label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.progress-step.active .progress-step__label { color: var(--text-primary); }
+.progress-step.completed .progress-step__label { color: var(--color-success); }
+
+.progress-step__line {
+  width: 40px;
+  height: 2px;
+  background: var(--border-default);
+  margin: 0 var(--space-2);
+  flex-shrink: 0;
+}
+
+.progress-step.completed + .progress-step .progress-step__line,
+.progress-step.completed .progress-step__line {
+  background: var(--color-success);
+}
+
+/* --- Error Banner --- */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+  color: var(--color-danger);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.error-banner svg { flex-shrink: 0; }
+
+.error-banner__close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  font-size: var(--font-base);
+  padding: var(--space-1);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.error-banner__close:hover { opacity: 1; }
+
+/* --- Content Area --- */
+.pay-page__content {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@media (max-width: 600px) {
+  .pay-page { padding: var(--space-5) 0 var(--space-10); }
+  .progress-step__label { display: none; }
+  .progress-step__line { width: 24px; }
+}

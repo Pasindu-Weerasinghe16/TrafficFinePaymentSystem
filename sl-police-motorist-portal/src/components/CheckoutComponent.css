@@ -1,0 +1,110 @@
+/* ===== Checkout Component ===== */
+
+.checkout {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.checkout__back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  margin-bottom: var(--space-6);
+}
+
+.checkout__back:hover { color: var(--text-secondary); }
+
+.checkout__summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+  backdrop-filter: blur(12px);
+}
+
+.checkout__summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.checkout__summary-ref {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.checkout__summary-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.checkout__total {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.checkout__form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  backdrop-filter: blur(12px);
+}
+
+.checkout__form-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-6);
+}
+
+.checkout__form-title svg { color: var(--color-success); }
+
+.checkout__form .form-group { margin-bottom: var(--space-5); }
+
+.checkout__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.checkout__pay-btn { margin-top: var(--space-4); }
+
+.checkout__secure-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-4);
+}
+
+.checkout__secure-note svg { color: var(--color-success); flex-shrink: 0; }
+
+@media (max-width: 600px) {
+  .checkout__form { padding: var(--space-5); }
+  .checkout__row { grid-template-columns: 1fr 1fr; }
+}
