@@ -3,5 +3,8 @@ FROM ${NODE_BASE_IMAGE}
 WORKDIR /workspace
 COPY package.json ./
 COPY server.js ./
+COPY index.html ./
+COPY index.css ./
+COPY src ./src
 EXPOSE 3001
 CMD ["node", "server.js"]

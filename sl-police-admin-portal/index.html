@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SL Police - Nationwide Traffic Fine Monitoring Portal</title>
+  
+  <!-- Modern Typography (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for Dashboard -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Styling Design System -->
+  <link rel="stylesheet" href="index.css">
+
+  <!-- Core Libraries from CDN -->
+  <!-- React and React-DOM (Development versions with full warnings) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- Babel Standalone to compile JSX in the browser in real-time -->
+  <script src="https://unpkg.com/@babel/standalone@7.22.9/babel.min.js"></script>
+  
+  <!-- Chart.js for premium analytics charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  
+  <div id="root">
+    <!-- Initial Loading Screen before React mounts -->
+    <div class="initial-loader">
+      <div class="loader-spinner"></div>
+      <p>Loading SL Police Admin Portal...</p>
+    </div>
+  </div>
+
+  <!-- React Entry Point module loaded natively by the browser -->
+  <script type="module" src="src/index.js"></script>
+
+</body>
+</html>
