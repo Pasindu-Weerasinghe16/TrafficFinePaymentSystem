@@ -51,7 +51,7 @@ services:
       POSTGRES_USER: traffic_fine
       POSTGRES_PASSWORD: traffic_fine
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - sl_police_postgres_primary_data:/var/lib/postgresql/data
 
@@ -63,7 +63,7 @@ services:
       POSTGRES_USER: traffic_fine
       POSTGRES_PASSWORD: traffic_fine
     ports:
-      - "5433:5432"
+      - "5436:5432"
     volumes:
       - sl_police_postgres_replica_data:/var/lib/postgresql/data
 
