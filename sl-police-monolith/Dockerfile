@@ -1,3 +1,6 @@
+# Global ARG - must be declared before any FROM to be usable in FROM
+ARG SPRING_BOOT_BASE_IMAGE=eclipse-temurin:21-jre-alpine
+
 # Build stage
 FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /build
@@ -5,8 +8,7 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Runtime stage
-ARG SPRING_BOOT_BASE_IMAGE=eclipse-temurin:21-jre-alpine
+# Runtime stage - uses the global ARG
 FROM ${SPRING_BOOT_BASE_IMAGE}
 WORKDIR /workspace
 COPY --from=builder /build/target/*.jar app.jar
