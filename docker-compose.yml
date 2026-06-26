@@ -4,33 +4,44 @@ services:
       context: ./sl-police-nginx
       args:
         NGINX_VERSION: ${NGINX_VERSION}
+    image: dockerpasindu/sl-police-nginx:1.0.0
     container_name: sl-police-nginx
     ports:
-      - "80:80"
+      - "8088:80"
     depends_on:
       - sl-police-gateway
+      - sl-police-monolith
 
   sl-police-gateway:
     build:
       context: ./sl-police-gateway
       args:
         SPRING_BOOT_BASE_IMAGE: ${SPRING_BOOT_BASE_IMAGE}
+    image: dockerpasindu/sl-police-gateway:1.0.0
     container_name: sl-police-gateway
     working_dir: /workspace
     command: ["sh", "-c", "sleep infinity"]
     ports:
-      - "8080:8080"
+      - "8089:8080"
 
   sl-police-monolith:
     build:
       context: ./sl-police-monolith
       args:
         SPRING_BOOT_BASE_IMAGE: ${SPRING_BOOT_BASE_IMAGE}
+    image: dockerpasindu/sl-police-monolith:1.0.0
     container_name: sl-police-monolith
-    working_dir: /workspace
-    command: ["sh", "-c", "sleep infinity"]
     ports:
       - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sl-police-postgres-primary:5432/traffic_fine
+      SPRING_DATASOURCE_USERNAME: traffic_fine
+      SPRING_DATASOURCE_PASSWORD: traffic_fine
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SERVER_PORT: 8081
+    depends_on:
+      - sl-police-postgres-primary
 
   sl-police-postgres-primary:
     image: postgres:${POSTGRES_VERSION}
@@ -40,7 +51,7 @@ services:
       POSTGRES_USER: traffic_fine
       POSTGRES_PASSWORD: traffic_fine
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - sl_police_postgres_primary_data:/var/lib/postgresql/data
 
@@ -52,7 +63,7 @@ services:
       POSTGRES_USER: traffic_fine
       POSTGRES_PASSWORD: traffic_fine
     ports:
-      - "5433:5432"
+      - "5436:5432"
     volumes:
       - sl_police_postgres_replica_data:/var/lib/postgresql/data
 
@@ -61,6 +72,7 @@ services:
       context: ./sl-police-mobile-app
       args:
         NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
+    image: dockerpasindu/sl-police-mobile-app:1.0.0
     container_name: sl-police-mobile-app
     ports:
       - "8082:8082"
@@ -70,6 +82,7 @@ services:
       context: ./sl-police-motorist-portal
       args:
         NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
+    image: dockerpasindu/sl-police-motorist-portal:1.0.0
     container_name: sl-police-motorist-portal
     ports:
       - "3000:3000"
@@ -79,6 +92,7 @@ services:
       context: ./sl-police-admin-portal
       args:
         NODE_BASE_IMAGE: ${NODE_BASE_IMAGE}
+    image: dockerpasindu/sl-police-admin-portal:1.0.0
     container_name: sl-police-admin-portal
     ports:
       - "3001:3001"
