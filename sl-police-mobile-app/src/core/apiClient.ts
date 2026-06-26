@@ -1,3 +1,3 @@
 export const apiClient = {
-  baseUrl: 'https://api.example.local',
+  baseUrl: 'http://localhost:8081/api', // Pointing directly to monolith backend bypassing the gateway
 };

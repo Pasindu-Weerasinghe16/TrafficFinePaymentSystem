@@ -1,3 +1,5 @@
+import { apiClient } from './apiClient';
+
 export interface FineValidationResult {
   amount: number;
   categoryName: string;
@@ -17,40 +19,35 @@ export interface PaymentResult {
   receiptNumber: string;
 }
 
-// Mock implementation of API endpoints
 export const validateFine = async (
   referenceNumber: string,
   categoryId: string,
   officerBadge: string
 ): Promise<FineValidationResult> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (referenceNumber && categoryId && officerBadge) {
-        resolve({
-          amount: 1500,
-          categoryName: 'Speeding',
-          isAlreadyPaid: false,
-        });
-      } else {
-        reject(new Error('Missing required fields'));
-      }
-    }, 1000);
-  });
+  const url = `${apiClient.baseUrl}/fines/validate?referenceNumber=${encodeURIComponent(referenceNumber)}&categoryId=${encodeURIComponent(categoryId)}&officerBadge=${encodeURIComponent(officerBadge)}`;
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error('Failed to validate fine');
+  }
+  
+  return response.json();
 };
 
 export const processPayment = async (
   paymentData: PaymentSubmission
 ): Promise<PaymentResult> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (paymentData.referenceNumber) {
-        resolve({
-          success: true,
-          receiptNumber: `REC-${Math.floor(Math.random() * 1000000)}`,
-        });
-      } else {
-        reject(new Error('Payment failed'));
-      }
-    }, 1500);
+  const response = await fetch(`${apiClient.baseUrl}/payments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(paymentData),
   });
+  
+  if (!response.ok) {
+    throw new Error('Payment failed');
+  }
+  
+  return response.json();
 };
