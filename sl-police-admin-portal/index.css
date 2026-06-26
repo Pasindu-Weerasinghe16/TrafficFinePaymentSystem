@@ -1,4 +1,4 @@
-/* Custom Design System for SL Police Admin Portal */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   --bg-primary: #080c14;
@@ -775,22 +775,9 @@ tr:hover td {
   gap: 0.5rem;
 }
 
-/* Responsiveness adjustments */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
-  .sidebar-brand span, .sidebar-nav-item span, .sidebar-footer button span {
-    display: none;
-  }
-  .main-content {
-    margin-left: 60px;
-  }
-  .header {
-    padding: 0 1rem;
-  }
-  .page-container {
-    padding: 1rem;
-    gap: 1rem;
-  }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .navbar { flex-wrap: wrap; }
+  .tab-content { padding: 1rem; }
 }

@@ -2,13 +2,10 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3001;
-
+const PORT = process.env.PORT || 3000;
 const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.json': 'application/json',
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css',
+  '.js': 'application/javascript', '.json': 'application/json',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.svg': 'image/svg+xml'
 };
 
@@ -28,4 +25,4 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => console.log(`Admin Portal running at http://localhost:${PORT}/`));
+server.listen(PORT, () => console.log(`Motorist Portal running at http://localhost:${PORT}/`));

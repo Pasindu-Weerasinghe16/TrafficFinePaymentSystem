@@ -1,44 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SL Police - Nationwide Traffic Fine Monitoring Portal</title>
-  
-  <!-- Modern Typography (Google Fonts) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons for Dashboard -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Custom Styling Design System -->
-  <link rel="stylesheet" href="index.css">
-
-  <!-- Core Libraries from CDN -->
-  <!-- React and React-DOM (Development versions with full warnings) -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  
-  <!-- Babel Standalone to compile JSX in the browser in real-time -->
-  <script src="https://unpkg.com/@babel/standalone@7.22.9/babel.min.js"></script>
-  
-  <!-- Chart.js for premium analytics charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SL Police — Traffic Fine Admin Portal</title>
+<meta name="description" content="Sri Lanka Police Traffic Fine Management System — Admin Portal for officers."/>
+<link rel="stylesheet" href="index.css"/>
 </head>
 <body>
-  
-  <div id="root">
-    <!-- Initial Loading Screen before React mounts -->
-    <div class="initial-loader">
-      <div class="loader-spinner"></div>
-      <p>Loading SL Police Admin Portal...</p>
+<div id="app">
+
+  <!-- LOGIN PAGE -->
+  <div id="page-login" class="page active">
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-logo">
+          <div class="badge-icon">🛡️</div>
+          <h1>SL Police</h1>
+          <p>Traffic Fine Admin Portal</p>
+        </div>
+        <form id="login-form">
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="login-username" placeholder="admin" required/>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required/>
+          </div>
+          <div id="login-error" class="error-msg"></div>
+          <button type="submit" class="btn btn-primary w-full">Sign In</button>
+        </form>
+      </div>
     </div>
   </div>
 
-  <!-- React Entry Point module loaded natively by the browser -->
-  <script type="module" src="src/index.js"></script>
+  <!-- MAIN APP -->
+  <div id="page-app" class="page">
+    <nav class="navbar">
+      <div class="nav-brand">🛡️ SL Police Admin</div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+        <button class="nav-tab" onclick="showTab('fines')">Fines</button>
+        <button class="nav-tab" onclick="showTab('issue')">Issue Fine</button>
+      </div>
+      <div class="nav-right">
+        <span id="nav-user"></span>
+        <button class="btn btn-sm btn-outline" onclick="logout()">Logout</button>
+      </div>
+    </nav>
 
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="page-header"><h2>Dashboard</h2><p>Real-time traffic fine statistics</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-val" id="stat-total">—</div><div class="stat-label">Total Fines</div></div>
+        <div class="stat-card warn"><div class="stat-icon">⏳</div><div class="stat-val" id="stat-pending">—</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card success"><div class="stat-icon">✅</div><div class="stat-val" id="stat-paid">—</div><div class="stat-label">Paid</div></div>
+        <div class="stat-card accent"><div class="stat-icon">💰</div><div class="stat-val" id="stat-revenue">—</div><div class="stat-label">Revenue (LKR)</div></div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header"><h3>Recent Fines</h3></div>
+        <div id="recent-fines-table"></div>
+      </div>
+    </div>
+
+    <!-- FINES TAB -->
+    <div id="tab-fines" class="tab-content">
+      <div class="page-header">
+        <h2>All Traffic Fines</h2>
+        <div class="header-actions">
+          <input type="text" id="search-vehicle" placeholder="Search by vehicle number…" oninput="filterFines()" class="search-input"/>
+          <select id="filter-status" onchange="filterFines()" class="select-input">
+            <option value="">All Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="PAID">Paid</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div class="card"><div id="fines-table"></div></div>
+    </div>
+
+    <!-- ISSUE FINE TAB -->
+    <div id="tab-issue" class="tab-content">
+      <div class="page-header"><h2>Issue New Fine</h2></div>
+      <div class="card form-card">
+        <form id="issue-form">
+          <div class="form-grid">
+            <div class="field">
+              <label>Vehicle Number *</label>
+              <input type="text" id="f-vehicle" placeholder="CAB-1234" required/>
+            </div>
+            <div class="field">
+              <label>Fine Amount (LKR) *</label>
+              <input type="number" id="f-amount" placeholder="2500" min="100" required/>
+            </div>
+            <div class="field">
+              <label>Location *</label>
+              <input type="text" id="f-location" placeholder="Galle Road, Colombo 03" required/>
+            </div>
+            <div class="field">
+              <label>Due Date</label>
+              <input type="date" id="f-due"/>
+            </div>
+            <div class="field full-span">
+              <label>Violation Description *</label>
+              <textarea id="f-desc" placeholder="Speeding — 85km/h in 60km/h zone" rows="3" required></textarea>
+            </div>
+          </div>
+          <div id="issue-msg" class="error-msg"></div>
+          <button type="submit" class="btn btn-primary">Issue Fine</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- FINE DETAIL MODAL -->
+    <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+      <div class="modal-card">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
 </body>
 </html>

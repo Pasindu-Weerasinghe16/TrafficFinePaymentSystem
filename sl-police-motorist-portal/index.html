@@ -1,18 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sri Lanka Police Traffic Fine Payment Portal - Pay your traffic fines online securely and conveniently." />
-    <meta name="keywords" content="Sri Lanka, Police, Traffic Fine, Payment, Online, Portal" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>SL Police - Traffic Fine Payment Portal</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SL Police — Traffic Fine Payment Portal</title>
+<meta name="description" content="Check and pay your Sri Lanka Police traffic fines online. Fast, secure, and convenient."/>
+<link rel="stylesheet" href="index.css"/>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">🛡️ <span>SL Police</span> Fine Payment</div>
+    <nav class="header-nav">
+      <button class="btn btn-ghost" onclick="showPage('search')">Search Fines</button>
+      <button class="btn btn-ghost" id="nav-login-btn" onclick="showPage('login')">Login</button>
+      <span id="nav-user-info" style="display:none">
+        <span id="nav-username"></span>
+        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO / SEARCH PAGE -->
+  <div id="page-search" class="page active">
+    <div class="hero">
+      <h1>Check Your Traffic Fines</h1>
+      <p>Enter your vehicle registration number to view outstanding fines</p>
+      <div class="search-box">
+        <input type="text" id="vehicle-input" placeholder="e.g. CAB-1234" class="search-input-hero"/>
+        <button class="btn btn-primary btn-lg" onclick="searchFines()">Search</button>
+      </div>
+    </div>
+    <div id="search-results" class="results-area"></div>
+  </div>
+
+  <!-- LOGIN PAGE -->
+  <div id="page-login" class="page">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <h2>Motorist Login</h2>
+        <p class="sub">Login to manage and pay your fines</p>
+        <form id="login-form">
+          <div class="field"><label>Username</label><input type="text" id="l-user" required/></div>
+          <div class="field"><label>Password</label><input type="password" id="l-pass" required/></div>
+          <div id="login-err" class="err-msg"></div>
+          <button type="submit" class="btn btn-primary w-full">Login</button>
+        </form>
+        <p class="switch-link">No account? <a href="#" onclick="showPage('register')">Register here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER PAGE -->
+  <div id="page-register" class="page">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <h2>Create Account</h2>
+        <p class="sub">Register to pay fines online</p>
+        <form id="reg-form">
+          <div class="form-grid">
+            <div class="field"><label>Full Name *</label><input type="text" id="r-name" required/></div>
+            <div class="field"><label>Username *</label><input type="text" id="r-user" required/></div>
+            <div class="field"><label>Email</label><input type="email" id="r-email"/></div>
+            <div class="field"><label>Phone</label><input type="tel" id="r-phone"/></div>
+            <div class="field full-span"><label>Password *</label><input type="password" id="r-pass" required/></div>
+          </div>
+          <div id="reg-err" class="err-msg"></div>
+          <button type="submit" class="btn btn-primary w-full">Create Account</button>
+        </form>
+        <p class="switch-link">Already registered? <a href="#" onclick="showPage('login')">Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAY FINE MODAL -->
+  <div id="pay-modal" class="modal-overlay" onclick="closePayModal(event)">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closePayModal()">✕</button>
+      <h2>Pay Fine</h2>
+      <div id="pay-fine-info"></div>
+      <form id="pay-form">
+        <div class="field"><label>Cardholder Name</label><input type="text" id="p-holder" placeholder="John Silva" required/></div>
+        <div class="field"><label>Card Number</label><input type="text" id="p-card" placeholder="1234 5678 9012 3456" maxlength="19" required/></div>
+        <div class="form-grid-2">
+          <div class="field"><label>Expiry</label><input type="text" id="p-expiry" placeholder="MM/YY" maxlength="5" required/></div>
+          <div class="field"><label>CVV</label><input type="text" id="p-cvv" placeholder="123" maxlength="3" required/></div>
+        </div>
+        <div id="pay-err" class="err-msg"></div>
+        <button type="submit" class="btn btn-success w-full btn-lg">💳 Pay Now</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUCCESS PAGE -->
+  <div id="page-success" class="page">
+    <div class="success-wrap">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h2>Payment Successful!</h2>
+        <p id="success-msg"></p>
+        <button class="btn btn-primary" onclick="showPage('search')">Search More Fines</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <p>© 2024 Sri Lanka Police Department — Traffic Fine Payment Portal</p>
+</footer>
+<script src="app.js"></script>
+</body>
 </html>
