@@ -42,7 +42,6 @@
       <div class="nav-tabs">
         <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
         <button class="nav-tab" onclick="showTab('fines')">Fines</button>
-        <button class="nav-tab" onclick="showTab('issue')">Issue Fine</button>
       </div>
       <div class="nav-right">
         <span id="nav-user"></span>
@@ -82,38 +81,7 @@
       <div class="card"><div id="fines-table"></div></div>
     </div>
 
-    <!-- ISSUE FINE TAB -->
-    <div id="tab-issue" class="tab-content">
-      <div class="page-header"><h2>Issue New Fine</h2></div>
-      <div class="card form-card">
-        <form id="issue-form">
-          <div class="form-grid">
-            <div class="field">
-              <label>Vehicle Number *</label>
-              <input type="text" id="f-vehicle" placeholder="CAB-1234" required/>
-            </div>
-            <div class="field">
-              <label>Fine Amount (LKR) *</label>
-              <input type="number" id="f-amount" placeholder="2500" min="100" required/>
-            </div>
-            <div class="field">
-              <label>Location *</label>
-              <input type="text" id="f-location" placeholder="Galle Road, Colombo 03" required/>
-            </div>
-            <div class="field">
-              <label>Due Date</label>
-              <input type="date" id="f-due"/>
-            </div>
-            <div class="field full-span">
-              <label>Violation Description *</label>
-              <textarea id="f-desc" placeholder="Speeding — 85km/h in 60km/h zone" rows="3" required></textarea>
-            </div>
-          </div>
-          <div id="issue-msg" class="error-msg"></div>
-          <button type="submit" class="btn btn-primary">Issue Fine</button>
-        </form>
-      </div>
-    </div>
+    <!-- ISSUE FINE TAB REMOVED -->
 
     <!-- FINE DETAIL MODAL -->
     <div id="modal" class="modal-overlay" onclick="closeModal(event)">

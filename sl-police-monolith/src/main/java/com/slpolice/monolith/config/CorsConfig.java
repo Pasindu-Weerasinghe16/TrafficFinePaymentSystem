@@ -1,4 +1,4 @@
-package com.slpolice.traffic.config;
+package com.slpolice.monolith.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;

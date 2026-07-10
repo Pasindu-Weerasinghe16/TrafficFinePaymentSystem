@@ -1,5 +1,19 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: sl-police-gateway
-
-# Route tables, rate limits, and JWT key configuration will be added here.
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: monolith_api
+          uri: http://sl-police-monolith:8081
+          predicates:
+            - Path=/api/**
