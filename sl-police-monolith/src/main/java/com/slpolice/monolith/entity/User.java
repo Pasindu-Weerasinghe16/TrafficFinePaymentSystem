@@ -27,4 +27,11 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    // Profile fields (populated for self-registered motorists; nullable for seeded/system accounts).
+    private String fullName;
+
+    private String email;
+
+    private String phone;
+
 }

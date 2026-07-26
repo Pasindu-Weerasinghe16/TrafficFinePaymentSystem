@@ -5,13 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Payload for motorist self-registration (POST /api/auth/register).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginResponse {
-    private String token;
+public class RegisterRequest {
     private String username;
-    private String role;
+    private String password;
     private String fullName;
+    private String email;
+    private String phone;
 }

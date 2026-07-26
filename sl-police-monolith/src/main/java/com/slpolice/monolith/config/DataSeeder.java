@@ -2,9 +2,11 @@ package com.slpolice.monolith.config;
 
 import com.slpolice.monolith.entity.FineCategory;
 import com.slpolice.monolith.entity.Officer;
+import com.slpolice.monolith.entity.TrafficFine;
 import com.slpolice.monolith.entity.User;
 import com.slpolice.monolith.repository.FineCategoryRepository;
 import com.slpolice.monolith.repository.OfficerRepository;
+import com.slpolice.monolith.repository.TrafficFineRepository;
 import com.slpolice.monolith.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * Seeds baseline data on startup so the platform is usable out of the box:
@@ -28,6 +31,7 @@ public class DataSeeder {
     private final UserRepository userRepository;
     private final FineCategoryRepository fineCategoryRepository;
     private final OfficerRepository officerRepository;
+    private final TrafficFineRepository trafficFineRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -36,6 +40,7 @@ public class DataSeeder {
             seedUsers();
             seedCategories();
             seedOfficers();
+            seedFines();
         };
     }
 
@@ -85,5 +90,42 @@ public class DataSeeder {
                     .build());
         }
         log.info("Seeded default officers");
+    }
+
+    private void seedFines() {
+        if (trafficFineRepository.count() > 0) {
+            return;
+        }
+        trafficFineRepository.save(TrafficFine.builder()
+                .referenceNumber("TF-DEMO0001")
+                .vehicleNumber("CAB1234")
+                .amount(new BigDecimal("3000"))
+                .location("Galle Road, Colombo 03")
+                .description("Exceeding speed limit (72 km/h in a 50 zone)")
+                .dueDate("2026-08-15")
+                .status("PENDING")
+                .issuedAt(LocalDateTime.now().minusDays(2))
+                .build());
+        trafficFineRepository.save(TrafficFine.builder()
+                .referenceNumber("TF-DEMO0002")
+                .vehicleNumber("CAB1234")
+                .amount(new BigDecimal("1500"))
+                .location("Marine Drive, Colombo 06")
+                .description("Driver not wearing a seatbelt")
+                .dueDate("2026-08-20")
+                .status("PENDING")
+                .issuedAt(LocalDateTime.now().minusDays(1))
+                .build());
+        trafficFineRepository.save(TrafficFine.builder()
+                .referenceNumber("TF-DEMO0003")
+                .vehicleNumber("KL7890")
+                .amount(new BigDecimal("2500"))
+                .location("Kandy Road, Kadawatha")
+                .description("Running a red light")
+                .dueDate("2026-08-10")
+                .status("PENDING")
+                .issuedAt(LocalDateTime.now().minusDays(3))
+                .build());
+        log.info("Seeded demo traffic fines (vehicles CAB1234, KL7890)");
     }
 }

@@ -2,6 +2,7 @@ package com.slpolice.monolith.controller;
 
 import com.slpolice.monolith.dto.LoginRequest;
 import com.slpolice.monolith.dto.LoginResponse;
+import com.slpolice.monolith.dto.RegisterRequest;
 import com.slpolice.monolith.entity.User;
 import com.slpolice.monolith.repository.UserRepository;
 import com.slpolice.monolith.security.JwtTokenProvider;
@@ -49,6 +50,7 @@ public class AuthController {
                     .token(token)
                     .username(user.getUsername())
                     .role(user.getRole())
+                    .fullName(user.getFullName())
                     .build();
 
             log.info("User logged in successfully: {}", user.getUsername());
@@ -58,6 +60,47 @@ public class AuthController {
             log.error("Error during login", ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("{\"error\": \"An error occurred during login\"}");
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            if (request.getUsername() == null || request.getUsername().isBlank()
+                    || request.getPassword() == null || request.getPassword().isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("{\"message\": \"Username and password are required\"}");
+            }
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("{\"message\": \"Username is already taken\"}");
+            }
+
+            User user = User.builder()
+                    .username(request.getUsername())
+                    .passwordHash(passwordEncoder.encode(request.getPassword()))
+                    .role("MOTORIST")
+                    .fullName(request.getFullName())
+                    .email(request.getEmail())
+                    .phone(request.getPhone())
+                    .build();
+            user = userRepository.save(user);
+
+            String token = jwtTokenProvider.generateTokenFromUsername(user.getUsername());
+            LoginResponse response = LoginResponse.builder()
+                    .token(token)
+                    .username(user.getUsername())
+                    .role(user.getRole())
+                    .fullName(user.getFullName())
+                    .build();
+
+            log.info("New motorist registered: {}", user.getUsername());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (Exception ex) {
+            log.error("Error during registration", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"An error occurred during registration\"}");
         }
     }
 }

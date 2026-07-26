@@ -1,10 +1,10 @@
 package com.slpolice.monolith.controller;
 
 import com.slpolice.monolith.dto.FineCategoryRequest;
+import com.slpolice.monolith.dto.FineResponse;
 import com.slpolice.monolith.dto.OfficerRequest;
 import com.slpolice.monolith.entity.FineCategory;
 import com.slpolice.monolith.entity.Officer;
-import com.slpolice.monolith.entity.TrafficFine;
 import com.slpolice.monolith.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +86,7 @@ public class AdminController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String status) {
         try {
-            Page<TrafficFine> fines = adminService.getAllFines(page, size, status);
+            Page<FineResponse> fines = adminService.getAllFines(page, size, status);
             return ResponseEntity.ok(fines);
         } catch (Exception ex) {
             log.error("Error fetching fines list", ex);
@@ -102,7 +102,7 @@ public class AdminController {
     @GetMapping("/fines/{id}")
     public ResponseEntity<?> getFineById(@PathVariable Long id) {
         try {
-            TrafficFine fine = adminService.getFineById(id);
+            FineResponse fine = adminService.getFineById(id);
             return ResponseEntity.ok(fine);
         } catch (IllegalArgumentException ex) {
             log.warn("Fine not found: {}", ex.getMessage());

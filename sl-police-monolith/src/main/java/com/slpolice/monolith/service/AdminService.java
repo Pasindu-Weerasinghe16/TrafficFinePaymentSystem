@@ -1,6 +1,7 @@
 package com.slpolice.monolith.service;
 
 import com.slpolice.monolith.dto.FineCategoryRequest;
+import com.slpolice.monolith.dto.FineResponse;
 import com.slpolice.monolith.dto.OfficerRequest;
 import com.slpolice.monolith.entity.FineCategory;
 import com.slpolice.monolith.entity.Officer;
@@ -42,11 +43,14 @@ public class AdminService {
                 .map(Payment::getAmountPaid)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        long pendingFines = trafficFineRepository.findAll().stream()
+        List<TrafficFine> allFines = trafficFineRepository.findAll();
+        long totalFinesIssued = allFines.size();
+        long pendingFines = allFines.stream()
                 .filter(f -> "PENDING".equalsIgnoreCase(f.getStatus()))
                 .count();
 
         Map<String, Object> stats = new HashMap<>();
+        stats.put("totalFinesIssued", totalFinesIssued);
         stats.put("totalFinesPaid", totalFinesPaid);
         stats.put("totalCollections", totalCollections);
         stats.put("pendingFines", pendingFines);
@@ -60,8 +64,9 @@ public class AdminService {
 
         Map<String, BigDecimal> districtMap = new HashMap<>();
         for (TrafficFine fine : paidFines) {
-            String district = fine.getOfficer().getDistrict();
-            BigDecimal amount = fine.getCategory().getAmount();
+            // Admin-issued fines have no officer/district; bucket them under "Unassigned".
+            String district = fine.getOfficer() != null ? fine.getOfficer().getDistrict() : "Unassigned";
+            BigDecimal amount = amountOf(fine);
             districtMap.merge(district, amount, BigDecimal::add);
         }
 
@@ -82,8 +87,9 @@ public class AdminService {
 
         Map<String, BigDecimal> categoryMap = new HashMap<>();
         for (TrafficFine fine : paidFines) {
-            String categoryName = fine.getCategory().getName();
-            BigDecimal amount = fine.getCategory().getAmount();
+            // Admin-issued fines have no category; bucket them under "Uncategorized".
+            String categoryName = fine.getCategory() != null ? fine.getCategory().getName() : "Uncategorized";
+            BigDecimal amount = amountOf(fine);
             categoryMap.merge(categoryName, amount, BigDecimal::add);
         }
 
@@ -99,21 +105,26 @@ public class AdminService {
 
     // ─── Fines Management ─────────────────────────────────────────────────────
 
-    public Page<TrafficFine> getAllFines(int page, int size, String status) {
+    public Page<FineResponse> getAllFines(int page, int size, String status) {
         Pageable pageable = PageRequest.of(page, size);
-        if (status != null && !status.isBlank()) {
-            return trafficFineRepository.findAll(pageable)
-                    .map(f -> f)
-                    ;
-            // Filter by status in-memory since no custom query is defined in existing repo
-            // Returning all then filtering; for large data add a custom repo method
-        }
-        return trafficFineRepository.findAll(pageable);
+        return trafficFineRepository.findAll(pageable).map(FineResponse::from);
     }
 
-    public TrafficFine getFineById(Long id) {
-        return trafficFineRepository.findById(id)
+    public FineResponse getFineById(Long id) {
+        TrafficFine fine = trafficFineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Fine not found with ID: " + id));
+        return FineResponse.from(fine);
+    }
+
+    /** Effective amount of a fine: its own amount, else its category's, else zero. */
+    private BigDecimal amountOf(TrafficFine fine) {
+        if (fine.getAmount() != null) {
+            return fine.getAmount();
+        }
+        if (fine.getCategory() != null && fine.getCategory().getAmount() != null) {
+            return fine.getCategory().getAmount();
+        }
+        return BigDecimal.ZERO;
     }
 
     // ─── Officer Management ───────────────────────────────────────────────────

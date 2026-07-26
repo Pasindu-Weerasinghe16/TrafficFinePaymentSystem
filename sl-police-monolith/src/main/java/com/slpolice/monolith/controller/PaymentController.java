@@ -1,5 +1,6 @@
 package com.slpolice.monolith.controller;
 
+import com.slpolice.monolith.dto.PaymentHistoryResponse;
 import com.slpolice.monolith.dto.PaymentRequest;
 import com.slpolice.monolith.dto.PaymentResponse;
 import com.slpolice.monolith.service.PaymentService;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/payments")
@@ -16,6 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
+
+    /** GET /api/payments/fine/{fineId} — payment history for a fine (admin portal). */
+    @GetMapping("/fine/{fineId}")
+    public ResponseEntity<List<PaymentHistoryResponse>> getPaymentsForFine(@PathVariable Long fineId) {
+        return ResponseEntity.ok(paymentService.getPaymentsForFine(fineId));
+    }
 
     /**
      * POST /api/payments

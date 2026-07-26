@@ -24,6 +24,9 @@ public class Payment {
     @JoinColumn(name = "fine_id", nullable = false)
     private TrafficFine fine;
 
+    // Public-facing receipt/transaction identifier (also returned to clients as receiptNumber).
+    private String transactionId;
+
     @Column(nullable = false)
     private BigDecimal amountPaid;
 
