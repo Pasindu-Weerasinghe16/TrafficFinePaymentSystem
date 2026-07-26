@@ -1,5 +1,30 @@
 spring:
   application:
     name: sl-police-gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:3000
+              - http://localhost:3001
+              - http://localhost:8082
+              - http://localhost:8088
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      routes:
+        - id: monolith-api
+          uri: http://sl-police-monolith:8081
+          predicates:
+            - Path=/api/**
 
-# Route tables, rate limits, and JWT key configuration will be added here.
+server:
+  port: 8080
