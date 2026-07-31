@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { processPayment } from '../core/api';
 
 export default function PaymentScreen({ route, navigation }: any) {
@@ -8,11 +19,35 @@ export default function PaymentScreen({ route, navigation }: any) {
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
+  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleExpiryChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    setExpiry(digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits);
+  };
+
   const handlePayment = async () => {
-    if (!cardNumber || !expiry || !cvv) {
-      Alert.alert('Error', 'Please enter payment details');
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+    const cleanLocation = location.trim();
+
+    if (!cleanLocation || !cleanCardNumber || !expiry.trim() || !cvv) {
+      Alert.alert('Error', 'Please enter the location and all payment details');
+      return;
+    }
+
+    if (!/^\d{12,19}$/.test(cleanCardNumber)) {
+      Alert.alert('Error', 'Enter a valid card number');
+      return;
+    }
+
+    if (!/^\d{2}\/\d{2}$/.test(expiry.trim())) {
+      Alert.alert('Error', 'Expiry must use MM/YY format');
+      return;
+    }
+
+    if (!/^\d{3,4}$/.test(cvv)) {
+      Alert.alert('Error', 'Enter a valid CVV');
       return;
     }
 
@@ -22,12 +57,21 @@ export default function PaymentScreen({ route, navigation }: any) {
         referenceNumber,
         categoryId,
         officerBadgeNumber: officerBadge,
-        location: '0.0,0.0', // mock location
-        paymentDetails: { cardNumber, expiry, cvv }
+        location: cleanLocation,
+        paymentDetails: {
+          method: 'CARD',
+          cardNumber: cleanCardNumber,
+          expiry: expiry.trim(),
+          cvv,
+        },
       });
 
       if (result.success) {
-        navigation.navigate('Success', { receiptNumber: result.receiptNumber });
+        navigation.replace('Success', {
+          receiptNumber: result.receiptNumber,
+          referenceNumber,
+          amount: fineDetails.amount,
+        });
       } else {
         Alert.alert('Error', 'Payment failed to process');
       }
@@ -39,62 +83,85 @@ export default function PaymentScreen({ route, navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Payment Details</Text>
-      
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Fine Summary</Text>
-        <View style={styles.row}>
-          <Text style={styles.label}>Category:</Text>
-          <Text style={styles.value}>{fineDetails.categoryName}</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Amount:</Text>
-          <Text style={styles.amount}>Rs. {fineDetails.amount}</Text>
-        </View>
-      </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Payment Details</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Credit/Debit Card</Text>
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Card Number"
-          keyboardType="numeric"
-          value={cardNumber}
-          onChangeText={setCardNumber}
-        />
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Fine Summary</Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>Reference:</Text>
+            <Text style={styles.value}>{referenceNumber}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Category:</Text>
+            <Text style={styles.value}>{fineDetails.categoryName}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Amount:</Text>
+            <Text style={styles.amount}>Rs. {fineDetails.amount}</Text>
+          </View>
+        </View>
 
-        <View style={styles.cardRow}>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Violation Location</Text>
           <TextInput
-            style={[styles.input, { flex: 1, marginRight: 10 }]}
-            placeholder="MM/YY"
-            value={expiry}
-            onChangeText={setExpiry}
+            style={styles.input}
+            placeholder="e.g., Colombo Fort or GPS coordinates"
+            value={location}
+            onChangeText={setLocation}
           />
+
+          <Text style={styles.cardTitle}>Credit/Debit Card</Text>
           <TextInput
-            style={[styles.input, { flex: 1 }]}
-            placeholder="CVV"
+            style={styles.input}
+            placeholder="Card Number"
             keyboardType="numeric"
-            secureTextEntry
-            value={cvv}
-            onChangeText={setCvv}
+            maxLength={23}
+            value={cardNumber}
+            onChangeText={setCardNumber}
           />
-        </View>
 
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={handlePayment}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Pay Rs. {fineDetails.amount}</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </View>
+          <View style={styles.cardRow}>
+            <TextInput
+              style={[styles.input, styles.halfInput, styles.leftInput]}
+              placeholder="MM/YY"
+              keyboardType="numeric"
+              maxLength={5}
+              value={expiry}
+              onChangeText={handleExpiryChange}
+            />
+            <TextInput
+              style={[styles.input, styles.halfInput]}
+              placeholder="CVV"
+              keyboardType="numeric"
+              maxLength={4}
+              secureTextEntry
+              value={cvv}
+              onChangeText={setCvv}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handlePayment}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Pay Rs. {fineDetails.amount}</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -102,6 +169,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flexGrow: 1,
     padding: 20,
   },
   title: {
@@ -163,6 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
+    marginTop: 5,
     color: '#333',
   },
   input: {
@@ -178,6 +249,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  halfInput: {
+    flex: 1,
+  },
+  leftInput: {
+    marginRight: 10,
+  },
   button: {
     backgroundColor: '#4caf50',
     padding: 15,
@@ -189,5 +266,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    opacity: 0.7,
   },
 });

@@ -1,3 +1,5 @@
+import { apiRequest } from './apiClient';
+
 export interface FineValidationResult {
   amount: number;
   categoryName: string;
@@ -6,51 +8,45 @@ export interface FineValidationResult {
 
 export interface PaymentSubmission {
   referenceNumber: string;
-  categoryId: string;
+  categoryId: number;
   officerBadgeNumber: string;
   location: string;
-  paymentDetails: any;
+  paymentDetails: {
+    method: string;
+    cardNumber: string;
+    expiry: string;
+    cvv: string;
+  };
 }
 
 export interface PaymentResult {
   success: boolean;
   receiptNumber: string;
+  message?: string;
 }
 
-// Mock implementation of API endpoints
 export const validateFine = async (
   referenceNumber: string,
-  categoryId: string,
+  categoryId: number,
   officerBadge: string
 ): Promise<FineValidationResult> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (referenceNumber && categoryId && officerBadge) {
-        resolve({
-          amount: 1500,
-          categoryName: 'Speeding',
-          isAlreadyPaid: false,
-        });
-      } else {
-        reject(new Error('Missing required fields'));
-      }
-    }, 1000);
-  });
+  const query = [
+    `referenceNumber=${encodeURIComponent(referenceNumber)}`,
+    `categoryId=${encodeURIComponent(String(categoryId))}`,
+    `officerBadge=${encodeURIComponent(officerBadge)}`,
+  ].join('&');
+
+  return apiRequest<FineValidationResult>(`/api/fines/validate?${query}`);
 };
 
 export const processPayment = async (
   paymentData: PaymentSubmission
 ): Promise<PaymentResult> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (paymentData.referenceNumber) {
-        resolve({
-          success: true,
-          receiptNumber: `REC-${Math.floor(Math.random() * 1000000)}`,
-        });
-      } else {
-        reject(new Error('Payment failed'));
-      }
-    }, 1500);
+  return apiRequest<PaymentResult>('/api/payments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(paymentData),
   });
 };

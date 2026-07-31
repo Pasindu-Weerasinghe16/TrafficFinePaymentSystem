@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function SuccessScreen({ route, navigation }: any) {
-  const { receiptNumber } = route.params;
+  const { receiptNumber, referenceNumber, amount } = route.params;
 
   return (
     <View style={styles.container}>
@@ -14,13 +14,17 @@ export default function SuccessScreen({ route, navigation }: any) {
         <Text style={styles.subtitle}>Your fine has been paid.</Text>
         
         <View style={styles.receiptBox}>
+          <Text style={styles.receiptLabel}>Fine Reference</Text>
+          <Text style={styles.receiptValue}>{referenceNumber}</Text>
+          <Text style={styles.receiptLabel}>Amount Paid</Text>
+          <Text style={styles.receiptValue}>Rs. {amount}</Text>
           <Text style={styles.receiptLabel}>Receipt Number:</Text>
           <Text style={styles.receiptNumber}>{receiptNumber}</Text>
         </View>
 
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigation.navigate('Search')}
+          onPress={() => navigation.popToTop()}
         >
           <Text style={styles.buttonText}>Return to Home</Text>
         </TouchableOpacity>
@@ -87,6 +91,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888',
     marginBottom: 5,
+  },
+  receiptValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 14,
   },
   receiptNumber: {
     fontSize: 18,
