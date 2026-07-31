@@ -1,4 +1,4 @@
-const API = 'http://localhost:8081/api';
+const API = 'http://localhost:8089/api';
 let token = localStorage.getItem('token');
 let allFines = [];
 
@@ -28,6 +28,15 @@ function logout() {
   document.getElementById('page-app').classList.remove('active');
 }
 
+// Called when an authenticated request comes back 401/403 (e.g. the JWT expired).
+// Sends the user back to the login screen with a clear message instead of
+// leaving a dead dashboard full of "—".
+function sessionExpired() {
+  logout();
+  const err = document.getElementById('login-error');
+  if (err) err.textContent = 'Your session has expired. Please sign in again.';
+}
+
 function authHeaders() { return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }; }
 
 /* ---- PAGES ---- */
@@ -51,17 +60,38 @@ function showTab(tab) {
 /* ---- DASHBOARD ---- */
 async function loadDashboard() {
   try {
-    const r = await fetch(`${API}/dashboard/stats`, { headers: authHeaders() });
-    const d = await r.json();
-    document.getElementById('stat-total').textContent = d.total;
-    document.getElementById('stat-pending').textContent = d.pending;
-    document.getElementById('stat-paid').textContent = d.paid;
-    document.getElementById('stat-revenue').textContent = 'LKR ' + Number(d.revenue||0).toLocaleString();
-    const fR = await fetch(`${API}/fines`, { headers: authHeaders() });
-    const fines = await fR.json();
-    const recent = fines.slice(-5).reverse();
+    const statsResponse = await fetch(`${API}/admin/stats/overview`, {
+      headers: authHeaders()
+    });
+
+    if (statsResponse.status === 401 || statsResponse.status === 403) { sessionExpired(); return; }
+    if (!statsResponse.ok) {
+      throw new Error(`Dashboard stats failed: ${statsResponse.status}`);
+    }
+
+    const stats = await statsResponse.json();
+
+    document.getElementById('stat-total').textContent = stats.totalFinesIssued ?? 0;
+    document.getElementById('stat-pending').textContent = stats.pendingFines ?? 0;
+    document.getElementById('stat-paid').textContent = stats.totalFinesPaid ?? 0;
+    document.getElementById('stat-revenue').textContent =
+      'LKR ' + Number(stats.totalCollections ?? 0).toLocaleString();
+
+    const finesResponse = await fetch(`${API}/admin/fines?page=0&size=5`, {
+      headers: authHeaders()
+    });
+
+    if (finesResponse.status === 401 || finesResponse.status === 403) { sessionExpired(); return; }
+    if (!finesResponse.ok) {
+      throw new Error(`Recent fines failed: ${finesResponse.status}`);
+    }
+
+    const finesData = await finesResponse.json();
+    const recent = finesData.content ?? [];
     document.getElementById('recent-fines-table').innerHTML = renderFinesTable(recent, true);
-  } catch(e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 /* ---- FINES ---- */
