@@ -1,6 +1,8 @@
 const API = 'http://localhost:8089/api';
 let token = localStorage.getItem('token');
 let allFines = [];
+let dashboardPoll = null;              // auto-refresh timer for the dashboard
+const DASHBOARD_REFRESH_MS = 8000;     // "real-time" stats poll interval
 
 /* ---- AUTH ---- */
 document.getElementById('login-form').addEventListener('submit', async e => {
@@ -23,9 +25,25 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 });
 
 function logout() {
+  stopDashboardAutoRefresh();
   localStorage.clear(); token = null;
   document.getElementById('page-login').classList.add('active');
   document.getElementById('page-app').classList.remove('active');
+}
+
+// Poll the dashboard stats so they stay live while the Dashboard tab is open,
+// without the user needing to refresh. Only fires when logged in and on that tab.
+function startDashboardAutoRefresh() {
+  if (dashboardPoll) return;
+  dashboardPoll = setInterval(() => {
+    const onDashboard = document.getElementById('tab-dashboard').classList.contains('active');
+    const appVisible = document.getElementById('page-app').classList.contains('active');
+    if (token && appVisible && onDashboard) loadDashboard();
+  }, DASHBOARD_REFRESH_MS);
+}
+
+function stopDashboardAutoRefresh() {
+  if (dashboardPoll) { clearInterval(dashboardPoll); dashboardPoll = null; }
 }
 
 // Called when an authenticated request comes back 401/403 (e.g. the JWT expired).
@@ -46,6 +64,7 @@ function showApp() {
   const u = JSON.parse(localStorage.getItem('user') || '{}');
   document.getElementById('nav-user').textContent = u.fullName || u.username || '';
   loadDashboard();
+  startDashboardAutoRefresh();
 }
 
 function showTab(tab) {
