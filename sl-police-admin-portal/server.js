@@ -22,7 +22,11 @@ const server = http.createServer((req, res) => {
     fs.readFile(abs, (err2, data) => {
       if (err2) { res.writeHead(500); res.end('Error'); return; }
       const ext = path.extname(abs).toLowerCase();
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      res.writeHead(200, {
+        'Content-Type': MIME[ext] || 'application/octet-stream',
+        // Without this the browser keeps serving a stale app.js/index.css after a rebuild.
+        'Cache-Control': 'no-store, must-revalidate'
+      });
       res.end(data);
     });
   });

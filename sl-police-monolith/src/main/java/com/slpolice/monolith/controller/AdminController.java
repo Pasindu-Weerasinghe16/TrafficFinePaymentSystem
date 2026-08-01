@@ -2,6 +2,7 @@ package com.slpolice.monolith.controller;
 
 import com.slpolice.monolith.dto.FineCategoryRequest;
 import com.slpolice.monolith.dto.OfficerRequest;
+import com.slpolice.monolith.dto.TrafficFineRequest;
 import com.slpolice.monolith.entity.FineCategory;
 import com.slpolice.monolith.entity.Officer;
 import com.slpolice.monolith.entity.TrafficFine;
@@ -92,6 +93,30 @@ public class AdminController {
             log.error("Error fetching fines list", ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("{\"error\": \"Failed to fetch fines\"}");
+        }
+    }
+
+    /**
+     * POST /api/admin/fines
+     * Issues a new fine in PENDING state.
+     */
+    @PostMapping("/fines")
+    public ResponseEntity<?> createFine(@RequestBody TrafficFineRequest request) {
+        try {
+            TrafficFine fine = adminService.createFine(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(fine);
+        } catch (IllegalStateException ex) {
+            log.warn("Fine not issued: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("{\"error\": \"" + ex.getMessage() + "\"}");
+        } catch (IllegalArgumentException ex) {
+            log.warn("Fine rejected due to bad input: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\": \"" + ex.getMessage() + "\"}");
+        } catch (Exception ex) {
+            log.error("Error issuing fine", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\": \"Failed to issue fine\"}");
         }
     }
 

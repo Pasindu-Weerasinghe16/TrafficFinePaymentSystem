@@ -130,3 +130,15 @@ input:focus { border-color: var(--primary); }
   .header-inner { flex-wrap: wrap; gap: .5rem; }
   .form-grid { grid-template-columns: 1fr; }
 }
+
+/* Feedback messages surfaced by app.js */
+.err-msg { color: #f43f5e; font-size: .9rem; min-height: 1.2em; margin: .5rem 0; }
+.success-msg { color: #10b981; font-size: .9rem; min-height: 1.2em; margin: .5rem 0; }
+.muted { color: #94a3b8; font-size: .85rem; }
+
+/* Search page: keep the hero compact so the lookup form stays above the fold.
+   .auth-wrap was sized for a standalone login screen, not a hero + form stack. */
+#page-search .hero { padding: 2.75rem 2rem 2.25rem; }
+#page-search .hero h1 { font-size: 2rem; }
+#page-search .hero p { margin-bottom: 0; }
+#page-search .auth-wrap { min-height: auto; padding: 2rem 2rem 0; }

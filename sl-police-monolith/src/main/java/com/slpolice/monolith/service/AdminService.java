@@ -2,6 +2,7 @@ package com.slpolice.monolith.service;
 
 import com.slpolice.monolith.dto.FineCategoryRequest;
 import com.slpolice.monolith.dto.OfficerRequest;
+import com.slpolice.monolith.dto.TrafficFineRequest;
 import com.slpolice.monolith.entity.FineCategory;
 import com.slpolice.monolith.entity.Officer;
 import com.slpolice.monolith.entity.Payment;
@@ -13,11 +14,13 @@ import com.slpolice.monolith.repository.TrafficFineRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +63,11 @@ public class AdminService {
 
         Map<String, BigDecimal> districtMap = new HashMap<>();
         for (TrafficFine fine : paidFines) {
+            // Legacy rows predate the officer/category NOT NULL constraint and would
+            // otherwise take down the whole statistic with an NPE.
+            if (fine.getOfficer() == null || fine.getCategory() == null) {
+                continue;
+            }
             String district = fine.getOfficer().getDistrict();
             BigDecimal amount = fine.getCategory().getAmount();
             districtMap.merge(district, amount, BigDecimal::add);
@@ -82,6 +90,9 @@ public class AdminService {
 
         Map<String, BigDecimal> categoryMap = new HashMap<>();
         for (TrafficFine fine : paidFines) {
+            if (fine.getCategory() == null) {
+                continue;
+            }
             String categoryName = fine.getCategory().getName();
             BigDecimal amount = fine.getCategory().getAmount();
             categoryMap.merge(categoryName, amount, BigDecimal::add);
@@ -101,19 +112,60 @@ public class AdminService {
 
     public Page<TrafficFine> getAllFines(int page, int size, String status) {
         Pageable pageable = PageRequest.of(page, size);
-        if (status != null && !status.isBlank()) {
-            return trafficFineRepository.findAll(pageable)
-                    .map(f -> f)
-                    ;
-            // Filter by status in-memory since no custom query is defined in existing repo
-            // Returning all then filtering; for large data add a custom repo method
+        if (status == null || status.isBlank()) {
+            return trafficFineRepository.findAll(pageable);
         }
-        return trafficFineRepository.findAll(pageable);
+
+        // No status-aware repository method exists, so filter in memory and page the
+        // result by hand. Fine for demo volumes; add a derived query if this grows.
+        List<TrafficFine> matching = trafficFineRepository.findAll().stream()
+                .filter(f -> status.equalsIgnoreCase(f.getStatus()))
+                .collect(Collectors.toList());
+
+        int from = Math.min((int) pageable.getOffset(), matching.size());
+        int to = Math.min(from + pageable.getPageSize(), matching.size());
+        return new PageImpl<>(matching.subList(from, to), pageable, matching.size());
     }
 
     public TrafficFine getFineById(Long id) {
         return trafficFineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Fine not found with ID: " + id));
+    }
+
+    /**
+     * Issues a new fine in PENDING state so it can then be settled through the
+     * motorist portal or the mobile app.
+     */
+    public TrafficFine createFine(TrafficFineRequest request) {
+        String reference = request.getReferenceNumber() == null ? "" : request.getReferenceNumber().trim();
+        if (reference.isEmpty()) {
+            throw new IllegalArgumentException("Reference number is required");
+        }
+        if (request.getLocation() == null || request.getLocation().isBlank()) {
+            throw new IllegalArgumentException("Location is required");
+        }
+        // reference_number is unique, so a duplicate would fail at the database instead
+        // of returning a message the portal can display.
+        if (trafficFineRepository.findByReferenceNumber(reference).isPresent()) {
+            throw new IllegalStateException("A fine with reference number " + reference + " already exists");
+        }
+
+        FineCategory category = fineCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Fine category not found with ID: " + request.getCategoryId()));
+        Officer officer = officerRepository.findByBadgeNumber(request.getOfficerBadgeNumber())
+                .orElseThrow(() -> new IllegalArgumentException("Officer not found with badge: " + request.getOfficerBadgeNumber()));
+
+        TrafficFine fine = TrafficFine.builder()
+                .referenceNumber(reference)
+                .category(category)
+                .officer(officer)
+                .location(request.getLocation().trim())
+                .status("PENDING")
+                .issuedAt(LocalDateTime.now())
+                .build();
+
+        log.info("Issued fine {} ({}) by officer {}", reference, category.getName(), officer.getBadgeNumber());
+        return trafficFineRepository.save(fine);
     }
 
     // ─── Officer Management ───────────────────────────────────────────────────

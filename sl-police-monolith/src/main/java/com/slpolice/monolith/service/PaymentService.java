@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -33,12 +34,12 @@ public class PaymentService {
     @Transactional
     public PaymentResponse processPayment(PaymentRequest request) {
         // Step 1: Check if this fine reference was already paid
-        trafficFineRepository.findByReferenceNumber(request.getReferenceNumber())
-                .ifPresent(existing -> {
-                    if ("PAID".equalsIgnoreCase(existing.getStatus())) {
-                        throw new IllegalStateException("Fine with reference number " + request.getReferenceNumber() + " has already been paid.");
-                    }
-                });
+        Optional<TrafficFine> existingFine = trafficFineRepository.findByReferenceNumber(request.getReferenceNumber());
+        existingFine.ifPresent(existing -> {
+            if ("PAID".equalsIgnoreCase(existing.getStatus())) {
+                throw new IllegalStateException("Fine with reference number " + request.getReferenceNumber() + " has already been paid.");
+            }
+        });
 
         // Step 2: Find the fine category
         FineCategory category = fineCategoryRepository.findById(request.getCategoryId())
@@ -48,15 +49,17 @@ public class PaymentService {
         Officer officer = officerRepository.findByBadgeNumber(request.getOfficerBadgeNumber())
                 .orElseThrow(() -> new IllegalArgumentException("Officer not found with badge: " + request.getOfficerBadgeNumber()));
 
-        // Step 4: Save TrafficFine record
-        TrafficFine trafficFine = TrafficFine.builder()
+        // Step 4: Save the TrafficFine record. A pre-issued fine already has a row, so
+        // update it in place - inserting a second row would break the unique constraint
+        // on reference_number.
+        TrafficFine trafficFine = existingFine.orElseGet(() -> TrafficFine.builder()
                 .referenceNumber(request.getReferenceNumber())
-                .category(category)
-                .officer(officer)
-                .location(request.getLocation())
-                .status("PAID")
                 .issuedAt(LocalDateTime.now())
-                .build();
+                .build());
+        trafficFine.setCategory(category);
+        trafficFine.setOfficer(officer);
+        trafficFine.setLocation(request.getLocation());
+        trafficFine.setStatus("PAID");
         trafficFine = trafficFineRepository.save(trafficFine);
 
         // Step 5: Extract payment method from paymentDetails map
